@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mld to library </title>
+    <style>
+        body{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            gap:10px
+        }
+
+        body > textarea {
+            width: 50%;
+            min-height: 50vh;
+            border-radius: 5px;
+            border:2px solid#01071e ;
+
+        }
+
+        button{
+            border-radius: 5px;
+            position: relative;
+            color: var(--text);
+            padding: 15px 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border:none;
+            z-index: 10;
+            transform-style: preserve-3d;
+            transition: all 0.3s;
+            border:2px solid#01071e ;
+        }
+
+        button:hover{
+            transform: translate(9px, 9px);
+        }
+        
+        
+        button::after{
+            border-radius: 5px;
+        
+            transform: translateZ(-1px);
+        
+            content: "";
+            position: absolute;
+            top: 9px    ;
+            left : 9px  ;
+            width: calc(100%);
+            height: calc(100%);
+            background-image: radial-gradient(circle at 1px 1px, black 1px, transparent 0);
+            background-size: 3px 3px;
+            transition: all 0.3s;
+            z-index: -3;
+        
+        }
+
+        button:hover::after{
+            top: 0;
+                left: 0;
+        }
+
+
+    </style>
+</head>
+<body>
+    
+    <label>Put your MLD text right there !</label>
+    <textarea name="" id="mld-text" ></textarea> 
+
+    <button onclick=download_csv()>Download csv</button>
+    <script>
+
+
+        function download_csv () {
+
+            let resultContent = "Table;Code;Name;Type;Constraints\n";
+            const mld_text = document.querySelector('#mld-text')
+    
+    
+            const array_tables = mld_text.value.split('\n')
+
+    
+    
+            for (let table in array_tables){
+                if ( array_tables[table].length>5){
+                    const tableName = array_tables[table].split("=")[0]
+                    const tableContent = array_tables[table].split("=")[1].replace("(","").replace(");","").split(", ")
+                    for (let field in tableContent){
+                        field = tableContent[field].replace(" id","id").replace(" #","#").split(" ")
+                        if (field.length>1){
+    
+                            resultContent += tableName+";"+field[0]+";;"+field[1]+";\n";
+                        }
+                    }
+
+                }
+    
+            }
+            var pom = document.createElement('a');
+            var csvContent=resultContent; //here we load our csv data 
+            var blob = new Blob([csvContent],{type: 'text/csv;charset=utf-8;'});
+            var url = URL.createObjectURL(blob);
+            pom.href = url;
+            pom.setAttribute('download', 'dictionnaire.csv');
+            pom.click();
+        }
+    </script>
+</body>
+</html>
